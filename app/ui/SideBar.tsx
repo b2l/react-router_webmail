@@ -13,7 +13,6 @@ import type { loader } from "~/routes/layout";
 import type { ReactNode } from "react";
 
 export default function SideBar() {
-  const params = useParams()
   const loaderData = useLoaderData<typeof loader>();
   return (
     <div className="flex flex-col w-50 gap-4 box-border">
@@ -31,7 +30,7 @@ export default function SideBar() {
           <div className="bg-rose-950 text-white">Something went wrong</div>
         )}
         {loaderData.ok &&
-          loaderData.data.list.map((mailbox) => (
+          loaderData.data?.map((mailbox) => (
             <MenuItem to={`${mailbox.id}`} key={mailbox.id}>
               <MailboxMenu unread={Number(mailbox.unreadEmails)}>
                 {mailbox.name.toLowerCase()}

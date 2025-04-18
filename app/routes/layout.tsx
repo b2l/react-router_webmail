@@ -2,34 +2,21 @@ import { Outlet, redirect } from "react-router";
 import { AppBar } from "~/ui/AppBar";
 import SideBar from "~/ui/SideBar";
 import type { Route } from "./+types/layout";
+import { getMailboxes } from "~/jmap";
 
 export function HydrateFallback() {
-  return <div>Loading... again</div>;
+  return <div>Loading...</div>;
 }
-const baseUrl = `https://127.0.0.1/jmap/`;
 
 export async function loader({ params }: Route.LoaderArgs) {
   try {
-    const resp = await fetch(`${baseUrl}/${params.id}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "post",
-      body: JSON.stringify({
-        using: ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:mail"],
-        methodCalls: [["Mailbox/get"]],
-      }),
-    });
-    const { methodResponses } = await resp.json();
-    const [, mailboxResponse] = methodResponses[0];
-
+    const mailboxes = await getMailboxes(params.id)
     if (!!params.mailboxId) {
-      return { ok: true, data: mailboxResponse };
+      return { ok: true, data: mailboxes };
     } else {
-      console.log(params)
       return redirect(
         `/${params.id}/${
-          mailboxResponse.list.find((mb) => mb.name === "INBOX").id
+          mailboxes.find((mb) => mb.name === "INBOX")?.id
         }`
       );
     }
